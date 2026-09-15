@@ -61,7 +61,7 @@ src/
 
 ```bash
 # 1. Clonar o repositório
-$ git clone https://github.com/BMO-O/sw_manager_api_tees.git
+$ git clone https://github.com/BMO-O/SW_Manager_API_TEES
 
 # 2. Acessar a pasta do projeto
 $ cd sw_manager_api_tees
