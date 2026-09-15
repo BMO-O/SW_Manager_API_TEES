@@ -8,15 +8,18 @@ const doc = {
     description:
       'API para gerenciamento de personagens do universo Star Wars, desenvolvida como projeto para TEES (UFF-2026/2)',
   },
-  host: 'localhost:3333',
-  basePath: '/',
-  schemes: ['http'],
   consumes: ['application/json'],
   produces: ['application/json'],
   tags: [
     {
       name: 'Characters',
       description: 'Endpoints de gerenciamento de personagens do universo Star Wars',
+    },
+  ],
+  servers: [
+    {
+      url: 'http://localhost:3333/api/v1/characters', 
+      description: 'Servidor Local',
     },
   ],
   definitions: {
