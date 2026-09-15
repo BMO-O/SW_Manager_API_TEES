@@ -1,0 +1,39 @@
+{
+  "name": "sw_manager_api_tees",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm run swagger-autogen && npx ts-node-dev src/main/server.ts",
+    "lint": "eslint src --ext .ts",
+    "swagger-autogen": "npx ts-node src/main/config/swagger-generator.ts",
+    "start": "npm run swagger-autogen && npx ts-node src/main/server.ts",
+    "build": "npm run swagger && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.2",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
+    "autogen": "^0.0.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "prettier": "^3.9.6",
+    "swagger": "^0.7.5",
+    "swagger-autogen": "^2.23.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

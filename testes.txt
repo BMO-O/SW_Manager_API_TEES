@@ -1,0 +1,85 @@
+//Arquivo utilizado para armazenar comandos curl para agilizar o processo de cada teste.
+
+
+curl -i -X POST http://localhost:3333/api/v1/characters \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "1",
+    "nome": "Luke Skywalker",
+    "raca": "Humano",
+    "classes": ["Jedi"],
+    "aliancas": ["Rebelde"],
+    "planetaNatal": "Tatooine"
+  }'
+  
+curl -i -X POST "http://localhost:3333/api/v1/characters" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "2",
+    "nome": "Ahsoka Tano",
+    "raca": "Togruta",
+    "classes": ["Jedi"],
+    "aliancas": ["Republica", "Rebelde"],
+    "planetaNatal": "Shili"
+  }'
+
+curl -i -X POST "http://localhost:3333/api/v1/characters" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "3",
+    "nome": "Darth Vader",
+    "raca": "Humano",
+    "classes": ["Sith", "Piloto"],
+    "aliancas": ["Imperio", "Ordem Sith"],
+    "planetaNatal": "Tatooine"
+  }'
+
+ESPERADO 201
+
+Listar todos os personagens:
+
+curl -i -X GET "http://localhost:3333/api/v1/characters"
+
+ESPERADO 200
+
+Filtros:
+
+curl -i -X GET "http://localhost:3333/api/v1/characters?raca=" 
+curl -i -X GET "http://localhost:3333/api/v1/characters?aliancas="
+curl -i -X GET "http://localhost:3333/api/v1/characters?classe="
+
+ESPERADO 200
+
+Filtrar por id:
+
+curl -i --request GET \
+  --url http://localhost:3333/api/v1/characters/1
+
+ESPERADO 200
+
+Atualizar personagens:
+
+curl -i --request PUT \
+  --url http://localhost:3333/api/v1/characters/1 \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "nome": "Luke Skywalker (Mestre Jedi)",
+    "classes": ["Jedi"],
+    "planetaNatal": "Ahch-To"
+  }'
+
+ESPERADO 200
+
+Remover personagens:
+
+curl -i --request DELETE \
+  --url http://localhost:3333/api/v1/characters/1
+
+ESPERADO 204
+
+Consultar Estatisticas:
+
+curl --request GET \
+  --url http://localhost:3333/api/v1/characters/stats
+
+ESPERADO 200
