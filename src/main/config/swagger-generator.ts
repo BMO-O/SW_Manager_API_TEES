@@ -4,96 +4,98 @@ import swaggerAutogen from 'swagger-autogen';
 const doc = {
   info: {
     version: '1.0.0',
-    title: 'Star Wars Characters API',
+    title: 'STAR WARS CHARACTERS API',
     description:
-      'API para gerenciamento de personagens do universo Star Wars, desenvolvida como projeto para TEES (UFF-2026/2)',
+      'API PARA GERENCIAMENTO DE PERSONAGENS DO UNIVERSO STAR WARS, DESENVOLVIDA COMO PROJETO PARA TEES (UFF-2026/2)',
   },
   consumes: ['application/json'],
   produces: ['application/json'],
-  tags: [
-    {
-      name: 'Characters',
-      description: 'Endpoints de gerenciamento de personagens do universo Star Wars',
-    },
-  ],
-  servers: [
-    {
-      url: 'http://localhost:3333/api/v1/characters', 
-      description: 'Servidor Local',
-    },
-  ],
+  tags: [{ name: 'Characters', description: 'ENDPOINTS DE GERENCIAMENTO DE PERSONAGENS DO UNIVERSO STAR WARS' }],
+  servers: [{ url: 'http://localhost:3333/api/v1/characters', description: 'SERVIDOR LOCAL' }],
   definitions: {
     CharacterRace: {
       type: 'string',
-      enum: [
-        'Humano', "Twi'lek", 'Togruta', 'Wookiee', 'Zabrak', 'Rodiano',
-        'Mon Calamari', 'Dathomiriano', 'Droide',
-      ],
+      enum: ['HUMANO', 'TWILEK', 'TOGRUTA', 'WOOKIEE', 'ZABRAK', 'RODIANO', 'MON_CALAMARI', 'DATHOMIRIANO', 'DROIDE'],
     },
     CharacterClass: {
       type: 'string',
       enum: [
-        'Jedi', 'Sith', 'Usuario da Forca', 'Soldado', 'Senador', 'Diplomata',
-        'Chanceler', 'Rei', 'Cavaleiro de Ren', 'Contrabandista', 'Piloto', 'Civil',
+        'JEDI', 'MESTRE_JEDI', 'SITH', 'LORDE_SITH', 'USUARIO_DA_FORCA', 'SOLDADO',
+        'OFICIAL', 'COMANDANTE', 'SENADOR', 'DIPLOMATA', 'CHANCELER', 'REI',
+        'CAVALEIRO_DE_REN', 'CONTRABANDISTA', 'PILOTO', 'CIVIL',
       ],
     },
     CharacterAlliance: {
       type: 'string',
       enum: [
-        'Republica', 'Separatista', 'Imperio', 'Rebelde', 'Ordem Jedi',
-        'Ordem Sith', 'Primeira Ordem', 'Resistencia', 'Cavaleiros de Ren',
+        'REPUBLICA', 'SEPARATISTA', 'IMPERIO', 'REBELDE', 'ORDEM_JEDI',
+        'ORDEM_SITH', 'PRIMEIRA_ORDEM', 'RESISTENCIA', 'CAVALEIROS_DE_REN',
       ],
     },
-
     Character: {
       id: '1',
-      nome: 'Luke Skywalker',
-      raca: 'Humano',
-      classes: ['Jedi'], 
-      aliancas: ['Rebelde', 'Ordem Jedi'], 
-      planetaNatal: 'Tatooine',
+      nome: 'LUKE SKYWALKER',
+      raca: 'HUMANO',
+      classes: ['JEDI'],
+      aliancas: ['REBELDE', 'ORDEM_JEDI'],
+      planetaNatal: 'TATOOINE',
     },
-
     CreateCharacterDTO: {
-      $id: '1', 
-      $nome: 'Luke Skywalker',
-      $raca: 'Humano',
-      $classes: ['Jedi'],
-      $aliancas: ['Rebelde', 'Ordem Jedi'],
-      $planetaNatal: 'Tatooine',
+      $id: '1',
+      $nome: 'LUKE SKYWALKER',
+      $raca: 'HUMANO',
+      $classes: ['JEDI'],
+      $aliancas: ['REBELDE', 'ORDEM_JEDI'],
+      $planetaNatal: 'TATOOINE',
     },
-
     UpdateCharacterDTO: {
-      nome: 'Luke Skywalker (Mestre Jedi)',
-      raca: 'Humano',
-      classes: ['Jedi', 'Mestre Jedi'],
-      aliancas: ['Rebelde', 'Ordem Jedi'],
-      planetaNatal: 'Dagobah',
+      nome: 'LUKE SKYWALKER (MESTRE JEDI)',
+      raca: 'HUMANO',
+      classes: ['JEDI', 'MESTRE_JEDI'],
+      aliancas: ['REBELDE', 'ORDEM_JEDI'],
+      planetaNatal: 'DAGOBAH',
     },
-
+    EvolveCharacterClassDTO: {
+      fromClass: 'USUARIO_DA_FORCA',
+      toClass: 'JEDI',
+    },
+    PaginatedCharacters: {
+      data: [
+        {
+          id: '1',
+          nome: 'LUKE SKYWALKER',
+          raca: 'HUMANO',
+          classes: ['JEDI'],
+          aliancas: ['REBELDE', 'ORDEM_JEDI'],
+          planetaNatal: 'TATOOINE',
+        },
+      ],
+      meta: { page: 1, limit: 10, total: 1 },
+    },
+    ExternalCharacterDetails: {
+      name: 'Luke Skywalker',
+      heightCm: 172,
+      massKg: 77,
+      hairColor: 'blond',
+      eyeColor: 'blue',
+      birthYear: '19BBY',
+      gender: 'male',
+      filmsCount: 4,
+    },
     ErrorResponse: {
-      message: 'Personagem não encontrado.', 
+      status: 'error',
+      message: 'PERSONAGEM NÃO ENCONTRADO.',
     },
-
+    ValidationErrorResponse: {
+      status: 'error',
+      message: 'DADOS DE ENTRADA INVÁLIDOS.',
+      details: [{ field: 'nome', message: 'O NOME DEVE TER NO MÍNIMO 2 CARACTERES' }],
+    },
     CharacterStats: {
       totalCharacters: 3,
-      racesCount: {
-        Humano: 2,
-        Togruta: 1,
-      },
-      classesCount: {
-        Jedi: 2,
-        Sith: 1,
-        Piloto: 1,
-        'Usuario da Forca': 2,
-      },
-      alliancesCount: {
-        Rebelde: 2,
-        Imperio: 1,
-        'Ordem Jedi': 1,
-        'Ordem Sith': 1,
-        Republica: 1,
-      },
+      racesCount: { HUMANO: 2, TOGRUTA: 1 },
+      classesCount: { JEDI: 2, SITH: 1, PILOTO: 1, USUARIO_DA_FORCA: 2 },
+      alliancesCount: { REBELDE: 2, IMPERIO: 1, ORDEM_JEDI: 1, ORDEM_SITH: 1, REPUBLICA: 1 },
     },
   },
 };

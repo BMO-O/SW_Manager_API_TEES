@@ -2,19 +2,19 @@
   "openapi": "3.0.0",
   "info": {
     "version": "1.0.0",
-    "title": "Star Wars Characters API",
-    "description": "API para gerenciamento de personagens do universo Star Wars, desenvolvida como projeto para TEES (UFF-2026/2)"
+    "title": "STAR WARS CHARACTERS API",
+    "description": "API PARA GERENCIAMENTO DE PERSONAGENS DO UNIVERSO STAR WARS, DESENVOLVIDA COMO PROJETO PARA TEES (UFF-2026/2)"
   },
   "servers": [
     {
       "url": "http://localhost:3333/api/v1/characters",
-      "description": "Servidor Local"
+      "description": "SERVIDOR LOCAL"
     }
   ],
   "tags": [
     {
       "name": "Characters",
-      "description": "Endpoints de gerenciamento de personagens do universo Star Wars"
+      "description": "ENDPOINTS DE GERENCIAMENTO DE PERSONAGENS DO UNIVERSO STAR WARS"
     }
   ],
   "paths": {
@@ -23,11 +23,11 @@
         "tags": [
           "Characters"
         ],
-        "summary": "Consulta estatísticas do catálogo",
-        "description": "Retorna a quantidade total de personagens e a distribuição por raça, classe e aliança.",
+        "summary": "CONSULTA ESTATÍSTICAS DO CATÁLOGO",
+        "description": "RETORNA A QUANTIDADE TOTAL DE PERSONAGENS E A DISTRIBUIÇÃO POR RAÇA, CLASSE E ALIANÇA.",
         "responses": {
           "200": {
-            "description": "Estatísticas retornadas com sucesso.",
+            "description": "ESTATÍSTICAS RETORNADAS COM SUCESSO.",
             "content": {
               "application/json": {
                 "schema": {
@@ -42,7 +42,90 @@
             }
           },
           "500": {
-            "description": "Erro interno do servidor.",
+            "description": "ERRO INTERNO DO SERVIDOR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/swapi/search": {
+      "get": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "CONSULTA UM PERSONAGEM NA SWAPI OFICIAL",
+        "description": "CONSOME O GATEWAY EXTERNO (BOUNDARY LAYER) PARA BUSCAR DADOS OFICIAIS DE UM PERSONAGEM DIRETAMENTE NA SWAPI (STAR WARS API). NÃO CONSULTA O BANCO DE DADOS LOCAL.",
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "NOME (OU PARTE DO NOME) DO PERSONAGEM A SER BUSCADO NA SWAPI.",
+            "required": true,
+            "example": "LUKE",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PERSONAGEM ENCONTRADO NA SWAPI.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalCharacterDetails"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalCharacterDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "PARÂMETRO NOME INVÁLIDO OU AUSENTE.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NENHUM PERSONAGEM ENCONTRADO NA SWAPI COM O NOME INFORMADO.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "SERVIÇO EXTERNO DA SWAPI INDISPONÍVEL OU TIMEOUT.",
             "content": {
               "application/json": {
                 "schema": {
@@ -64,14 +147,23 @@
         "tags": [
           "Characters"
         ],
-        "summary": "Lista os personagens",
-        "description": "Retorna todos os personagens cadastrados. Pode receber classe, raça e aliança como filtros pela query string.",
+        "summary": "LISTA OS PERSONAGENS",
+        "description": "RETORNA OS PERSONAGENS CADASTRADOS, DE FORMA PAGINADA. PODE RECEBER NOME, CLASSE, RAÇA E ALIANÇA COMO FILTROS, ALÉM DE PAGE E LIMIT.",
         "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "FILTRA PELO NOME (BUSCA PARCIAL).",
+            "example": "LUKE",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "raca",
             "in": "query",
-            "description": "Filtra personagens pela raça.",
-            "example": "Humano",
+            "description": "FILTRA PELA RAÇA.",
+            "example": "HUMANO",
             "schema": {
               "type": "string"
             }
@@ -79,8 +171,8 @@
           {
             "name": "classe",
             "in": "query",
-            "description": "Filtra personagens pela classe.",
-            "example": "Jedi",
+            "description": "FILTRA PELA CLASSE.",
+            "example": "JEDI",
             "schema": {
               "type": "string"
             }
@@ -88,55 +180,64 @@
           {
             "name": "alianca",
             "in": "query",
-            "description": "Filtra personagens pela aliança.",
-            "example": "Rebelde",
+            "description": "FILTRA PELA ALIANÇA.",
+            "example": "REBELDE",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "NÚMERO DA PÁGINA (PADRÃO: 1).",
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "ITENS POR PÁGINA (PADRÃO: 10, MÁXIMO: 50).",
+            "example": 10,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Lista de personagens retornada com sucesso.",
+            "description": "LISTA PAGINADA DE PERSONAGENS.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "$ref": "#/components/schemas/Character"
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
+                  "$ref": "#/components/schemas/PaginatedCharacters"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "$ref": "#/components/schemas/Character"
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
+                  "$ref": "#/components/schemas/PaginatedCharacters"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "PARÂMETROS DE BUSCA INVÁLIDOS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
                 }
               }
             }
           },
           "500": {
-            "description": "Erro interno do servidor.",
+            "description": "ERRO INTERNO DO SERVIDOR.",
             "content": {
               "application/json": {
                 "schema": {
@@ -156,101 +257,29 @@
         "tags": [
           "Characters"
         ],
-        "summary": "Cadastra um personagem",
-        "description": "Cria um novo personagem no catálogo.",
+        "summary": "CADASTRA UM PERSONAGEM",
+        "description": "",
         "responses": {
           "201": {
-            "description": "Personagem cadastrado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "object"
-                    },
-                    "properties": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "example": {
-                              "type": "string",
-                              "example": "Personagem cadastrado com sucesso!"
-                            }
-                          }
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/Character"
-                        }
-                      }
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "object"
-                    },
-                    "properties": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "example": {
-                              "type": "string",
-                              "example": "Personagem cadastrado com sucesso!"
-                            }
-                          }
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/Character"
-                        }
-                      }
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
-                }
-              }
-            }
+            "description": "PERSONAGEM CADASTRADO COM SUCESSO."
           },
           "400": {
-            "description": "Dados inválidos ou personagem já cadastrado.",
+            "description": "DADOS INVÁLIDOS.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
                 }
               }
             }
           },
-          "500": {
-            "description": "Erro interno do servidor.",
+          "409": {
+            "description": "PERSONAGEM COM ESTE ID JÁ EXISTE.",
             "content": {
               "application/json": {
                 "schema": {
@@ -282,8 +311,8 @@
         "tags": [
           "Characters"
         ],
-        "summary": "Busca um personagem por ID",
-        "description": "Retorna o personagem correspondente ao identificador informado.",
+        "summary": "BUSCA UM PERSONAGEM POR ID",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -292,13 +321,12 @@
             "schema": {
               "type": "string"
             },
-            "description": "Identificador do personagem.",
             "example": "1"
           }
         ],
         "responses": {
           "200": {
-            "description": "Personagem encontrado.",
+            "description": "PERSONAGEM ENCONTRADO.",
             "content": {
               "application/json": {
                 "schema": {
@@ -313,22 +341,7 @@
             }
           },
           "404": {
-            "description": "Personagem não encontrado.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Erro interno do servidor.",
+            "description": "PERSONAGEM NÃO ENCONTRADO.",
             "content": {
               "application/json": {
                 "schema": {
@@ -348,8 +361,8 @@
         "tags": [
           "Characters"
         ],
-        "summary": "Atualiza um personagem",
-        "description": "Atualiza os dados do personagem identificado pelo ID informado.",
+        "summary": "ATUALIZA UM PERSONAGEM",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -358,103 +371,15 @@
             "schema": {
               "type": "string"
             },
-            "description": "Identificador do personagem.",
             "example": "1"
           }
         ],
         "responses": {
           "200": {
-            "description": "Personagem atualizado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "object"
-                    },
-                    "properties": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "example": {
-                              "type": "string",
-                              "example": "Personagem atualizado com sucesso!"
-                            }
-                          }
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/Character"
-                        }
-                      }
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "object"
-                    },
-                    "properties": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "example": {
-                              "type": "string",
-                              "example": "Personagem atualizado com sucesso!"
-                            }
-                          }
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/Character"
-                        }
-                      }
-                    }
-                  },
-                  "xml": {
-                    "name": "main"
-                  }
-                }
-              }
-            }
+            "description": "PERSONAGEM ATUALIZADO COM SUCESSO."
           },
           "404": {
-            "description": "Personagem não encontrado.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Erro interno do servidor.",
+            "description": "PERSONAGEM NÃO ENCONTRADO.",
             "content": {
               "application/json": {
                 "schema": {
@@ -484,8 +409,8 @@
         "tags": [
           "Characters"
         ],
-        "summary": "Exclui um personagem",
-        "description": "Remove do catálogo o personagem identificado pelo ID informado.",
+        "summary": "EXCLUI UM PERSONAGEM",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -494,16 +419,55 @@
             "schema": {
               "type": "string"
             },
-            "description": "Identificador do personagem.",
             "example": "1"
           }
         ],
         "responses": {
           "204": {
-            "description": "Personagem excluído com sucesso."
+            "description": "PERSONAGEM EXCLUÍDO COM SUCESSO."
           },
           "404": {
-            "description": "Personagem não encontrado.",
+            "description": "PERSONAGEM NÃO ENCONTRADO.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/evolve": {
+      "patch": {
+        "tags": [
+          "Characters"
+        ],
+        "summary": "EVOLUI A CLASSE DE UM PERSONAGEM",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CLASSE EVOLUÍDA COM SUCESSO."
+          },
+          "400": {
+            "description": "TRANSIÇÃO DE CLASSE INVÁLIDA.",
             "content": {
               "application/json": {
                 "schema": {
@@ -517,8 +481,8 @@
               }
             }
           },
-          "500": {
-            "description": "Erro interno do servidor.",
+          "404": {
+            "description": "PERSONAGEM NÃO ENCONTRADO.",
             "content": {
               "application/json": {
                 "schema": {
@@ -529,6 +493,16 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvolveCharacterClassDTO"
               }
             }
           }
@@ -548,15 +522,15 @@
           "enum": {
             "type": "array",
             "example": [
-              "Humano",
-              "Twi'lek",
-              "Togruta",
-              "Wookiee",
-              "Zabrak",
-              "Rodiano",
-              "Mon Calamari",
-              "Dathomiriano",
-              "Droide"
+              "HUMANO",
+              "TWILEK",
+              "TOGRUTA",
+              "WOOKIEE",
+              "ZABRAK",
+              "RODIANO",
+              "MON_CALAMARI",
+              "DATHOMIRIANO",
+              "DROIDE"
             ],
             "items": {
               "type": "string"
@@ -577,18 +551,22 @@
           "enum": {
             "type": "array",
             "example": [
-              "Jedi",
-              "Sith",
-              "Usuario da Forca",
-              "Soldado",
-              "Senador",
-              "Diplomata",
-              "Chanceler",
-              "Rei",
-              "Cavaleiro de Ren",
-              "Contrabandista",
-              "Piloto",
-              "Civil"
+              "JEDI",
+              "MESTRE_JEDI",
+              "SITH",
+              "LORDE_SITH",
+              "USUARIO_DA_FORCA",
+              "SOLDADO",
+              "OFICIAL",
+              "COMANDANTE",
+              "SENADOR",
+              "DIPLOMATA",
+              "CHANCELER",
+              "REI",
+              "CAVALEIRO_DE_REN",
+              "CONTRABANDISTA",
+              "PILOTO",
+              "CIVIL"
             ],
             "items": {
               "type": "string"
@@ -609,15 +587,15 @@
           "enum": {
             "type": "array",
             "example": [
-              "Republica",
-              "Separatista",
-              "Imperio",
-              "Rebelde",
-              "Ordem Jedi",
-              "Ordem Sith",
-              "Primeira Ordem",
-              "Resistencia",
-              "Cavaleiros de Ren"
+              "REPUBLICA",
+              "SEPARATISTA",
+              "IMPERIO",
+              "REBELDE",
+              "ORDEM_JEDI",
+              "ORDEM_SITH",
+              "PRIMEIRA_ORDEM",
+              "RESISTENCIA",
+              "CAVALEIROS_DE_REN"
             ],
             "items": {
               "type": "string"
@@ -637,16 +615,16 @@
           },
           "nome": {
             "type": "string",
-            "example": "Luke Skywalker"
+            "example": "LUKE SKYWALKER"
           },
           "raca": {
             "type": "string",
-            "example": "Humano"
+            "example": "HUMANO"
           },
           "classes": {
             "type": "array",
             "example": [
-              "Jedi"
+              "JEDI"
             ],
             "items": {
               "type": "string"
@@ -655,8 +633,8 @@
           "aliancas": {
             "type": "array",
             "example": [
-              "Rebelde",
-              "Ordem Jedi"
+              "REBELDE",
+              "ORDEM_JEDI"
             ],
             "items": {
               "type": "string"
@@ -664,7 +642,7 @@
           },
           "planetaNatal": {
             "type": "string",
-            "example": "Tatooine"
+            "example": "TATOOINE"
           }
         },
         "xml": {
@@ -680,16 +658,16 @@
           },
           "nome": {
             "type": "string",
-            "example": "Luke Skywalker"
+            "example": "LUKE SKYWALKER"
           },
           "raca": {
             "type": "string",
-            "example": "Humano"
+            "example": "HUMANO"
           },
           "classes": {
             "type": "array",
             "example": [
-              "Jedi"
+              "JEDI"
             ],
             "items": {
               "type": "string"
@@ -698,8 +676,8 @@
           "aliancas": {
             "type": "array",
             "example": [
-              "Rebelde",
-              "Ordem Jedi"
+              "REBELDE",
+              "ORDEM_JEDI"
             ],
             "items": {
               "type": "string"
@@ -707,7 +685,7 @@
           },
           "planetaNatal": {
             "type": "string",
-            "example": "Tatooine"
+            "example": "TATOOINE"
           }
         },
         "required": [
@@ -727,17 +705,17 @@
         "properties": {
           "nome": {
             "type": "string",
-            "example": "Luke Skywalker (Mestre Jedi)"
+            "example": "LUKE SKYWALKER (MESTRE JEDI)"
           },
           "raca": {
             "type": "string",
-            "example": "Humano"
+            "example": "HUMANO"
           },
           "classes": {
             "type": "array",
             "example": [
-              "Jedi",
-              "Mestre Jedi"
+              "JEDI",
+              "MESTRE_JEDI"
             ],
             "items": {
               "type": "string"
@@ -746,8 +724,8 @@
           "aliancas": {
             "type": "array",
             "example": [
-              "Rebelde",
-              "Ordem Jedi"
+              "REBELDE",
+              "ORDEM_JEDI"
             ],
             "items": {
               "type": "string"
@@ -755,23 +733,183 @@
           },
           "planetaNatal": {
             "type": "string",
-            "example": "Dagobah"
+            "example": "DAGOBAH"
           }
         },
         "xml": {
           "name": "UpdateCharacterDTO"
         }
       },
+      "EvolveCharacterClassDTO": {
+        "type": "object",
+        "properties": {
+          "fromClass": {
+            "type": "string",
+            "example": "USUARIO_DA_FORCA"
+          },
+          "toClass": {
+            "type": "string",
+            "example": "JEDI"
+          }
+        },
+        "xml": {
+          "name": "EvolveCharacterClassDTO"
+        }
+      },
+      "PaginatedCharacters": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "1"
+                },
+                "nome": {
+                  "type": "string",
+                  "example": "LUKE SKYWALKER"
+                },
+                "raca": {
+                  "type": "string",
+                  "example": "HUMANO"
+                },
+                "classes": {
+                  "type": "array",
+                  "example": [
+                    "JEDI"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "aliancas": {
+                  "type": "array",
+                  "example": [
+                    "REBELDE",
+                    "ORDEM_JEDI"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "planetaNatal": {
+                  "type": "string",
+                  "example": "TATOOINE"
+                }
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "number",
+                "example": 1
+              },
+              "limit": {
+                "type": "number",
+                "example": 10
+              },
+              "total": {
+                "type": "number",
+                "example": 1
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "PaginatedCharacters"
+        }
+      },
+      "ExternalCharacterDetails": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Luke Skywalker"
+          },
+          "heightCm": {
+            "type": "number",
+            "example": 172
+          },
+          "massKg": {
+            "type": "number",
+            "example": 77
+          },
+          "hairColor": {
+            "type": "string",
+            "example": "blond"
+          },
+          "eyeColor": {
+            "type": "string",
+            "example": "blue"
+          },
+          "birthYear": {
+            "type": "string",
+            "example": "19BBY"
+          },
+          "gender": {
+            "type": "string",
+            "example": "male"
+          },
+          "filmsCount": {
+            "type": "number",
+            "example": 4
+          }
+        },
+        "xml": {
+          "name": "ExternalCharacterDetails"
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
           "message": {
             "type": "string",
-            "example": "Personagem não encontrado."
+            "example": "PERSONAGEM NÃO ENCONTRADO."
           }
         },
         "xml": {
           "name": "ErrorResponse"
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "example": "DADOS DE ENTRADA INVÁLIDOS."
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "nome"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "O NOME DEVE TER NO MÍNIMO 2 CARACTERES"
+                }
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "ValidationErrorResponse"
         }
       },
       "CharacterStats": {
@@ -784,11 +922,11 @@
           "racesCount": {
             "type": "object",
             "properties": {
-              "Humano": {
+              "HUMANO": {
                 "type": "number",
                 "example": 2
               },
-              "Togruta": {
+              "TOGRUTA": {
                 "type": "number",
                 "example": 1
               }
@@ -797,19 +935,19 @@
           "classesCount": {
             "type": "object",
             "properties": {
-              "Jedi": {
+              "JEDI": {
                 "type": "number",
                 "example": 2
               },
-              "Sith": {
+              "SITH": {
                 "type": "number",
                 "example": 1
               },
-              "Piloto": {
+              "PILOTO": {
                 "type": "number",
                 "example": 1
               },
-              "Usuario da Forca": {
+              "USUARIO_DA_FORCA": {
                 "type": "number",
                 "example": 2
               }
@@ -818,23 +956,23 @@
           "alliancesCount": {
             "type": "object",
             "properties": {
-              "Rebelde": {
+              "REBELDE": {
                 "type": "number",
                 "example": 2
               },
-              "Imperio": {
+              "IMPERIO": {
                 "type": "number",
                 "example": 1
               },
-              "Ordem Jedi": {
+              "ORDEM_JEDI": {
                 "type": "number",
                 "example": 1
               },
-              "Ordem Sith": {
+              "ORDEM_SITH": {
                 "type": "number",
                 "example": 1
               },
-              "Republica": {
+              "REPUBLICA": {
                 "type": "number",
                 "example": 1
               }

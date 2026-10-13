@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { characterRoutes } from '../infrastructure/http/routes/character-routes';
 import { errorHandler } from '../infrastructure/http/middlewares/errorHandler';
@@ -14,7 +15,7 @@ app.use(errorHandler);
 const PORT = 3333;
 
 app.listen(PORT, () => {
-  console.log(`[server]: Servidor rodando em http://localhost:|${PORT}`);
+  console.log(`[server]: Servidor rodando em http://localhost:${PORT}`);
   console.log(
     `[docs]: Documentação disponível em http://localhost:${PORT}/api/docs`,
   );

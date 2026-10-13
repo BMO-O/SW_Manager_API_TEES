@@ -1,42 +1,60 @@
 import { AppError } from '../errors/AppError';
 
 export enum CharacterClass {
-  JEDI = 'Jedi',
-  SITH = 'Sith',
-  USUARIO_DA_FORCA = 'Usuario da Forca',
-  SOLDADO = 'Soldado',
-  SENADOR = 'Senador',
-  DIPLOMATA = 'Diplomata',
-  CHANCELER = 'Chanceler',
-  REI = 'Rei',
-  CAVALEIRO_DE_REN = 'Cavaleiro de Ren',
-  CONTRABANDISTA = 'Contrabandista',
-  PILOTO = 'Piloto',
-  CIVIL = 'Civil',
+  JEDI = 'JEDI',
+  MESTRE_JEDI = 'MESTRE_JEDI',
+  SITH = 'SITH',
+  LORDE_SITH = 'LORDE_SITH',
+  USUARIO_DA_FORCA = 'USUARIO_DA_FORCA',
+  SOLDADO = 'SOLDADO',
+  OFICIAL = 'OFICIAL',
+  COMANDANTE = 'COMANDANTE',
+  SENADOR = 'SENADOR',
+  DIPLOMATA = 'DIPLOMATA',
+  CHANCELER = 'CHANCELER',
+  REI = 'REI',
+  CAVALEIRO_DE_REN = 'CAVALEIRO_DE_REN',
+  CONTRABANDISTA = 'CONTRABANDISTA',
+  PILOTO = 'PILOTO',
+  CIVIL = 'CIVIL',
 }
 
 export enum CharacterRace {
-  HUMANO = 'Humano',
-  TWILEK = "Twi'lek",
-  TOGRUTA = 'Togruta',
-  WOOKIEE = 'Wookiee',
-  ZABRAK = 'Zabrak',
-  RODIANO = 'Rodiano',
-  MON_CALAMARI = 'Mon Calamari',
-  DATHOMIRIANO = 'Dathomiriano',
-  DROIDE = 'Droide',
+  HUMANO = 'HUMANO',
+  TWILEK = 'TWILEK',
+  TOGRUTA = 'TOGRUTA',
+  WOOKIEE = 'WOOKIEE',
+  ZABRAK = 'ZABRAK',
+  RODIANO = 'RODIANO',
+  MON_CALAMARI = 'MON_CALAMARI',
+  DATHOMIRIANO = 'DATHOMIRIANO',
+  DROIDE = 'DROIDE',
 }
 
 export enum CharacterAlliance {
-  REPUBLICA = 'Republica',
-  SEPARATISTA = 'Separatista',
-  IMPERIO = 'Imperio',
-  REBELDE = 'Rebelde',
-  ORDEM_JEDI = 'Ordem Jedi',
-  ORDEM_SITH = 'Ordem Sith',
-  PRIMEIRA_ORDEM = 'Primeira Ordem',
-  RESISTENCIA = 'Resistencia',
-  CAVALEIROS_DE_REN = 'Cavaleiros de Ren',
+  REPUBLICA = 'REPUBLICA',
+  SEPARATISTA = 'SEPARATISTA',
+  IMPERIO = 'IMPERIO',
+  REBELDE = 'REBELDE',
+  ORDEM_JEDI = 'ORDEM_JEDI',
+  ORDEM_SITH = 'ORDEM_SITH',
+  PRIMEIRA_ORDEM = 'PRIMEIRA_ORDEM',
+  RESISTENCIA = 'RESISTENCIA',
+  CAVALEIROS_DE_REN = 'CAVALEIROS_DE_REN',
+}
+
+export const CHARACTER_CLASS_EVOLUTION_TRACKS: CharacterClass[][] = [
+  [CharacterClass.USUARIO_DA_FORCA, CharacterClass.JEDI, CharacterClass.MESTRE_JEDI],
+  [CharacterClass.USUARIO_DA_FORCA, CharacterClass.SITH, CharacterClass.LORDE_SITH],
+  [CharacterClass.SOLDADO, CharacterClass.OFICIAL, CharacterClass.COMANDANTE],
+];
+
+function isValidClassEvolution(fromClass: CharacterClass, toClass: CharacterClass): boolean {
+  return CHARACTER_CLASS_EVOLUTION_TRACKS.some((track) => {
+    const fromIndex = track.indexOf(fromClass);
+    const toIndex = track.indexOf(toClass);
+    return fromIndex !== -1 && toIndex === fromIndex + 1;
+  });
 }
 
 export interface CharacterProps {
@@ -108,5 +126,19 @@ export class Character {
     if (props.classes !== undefined) this.props.classes = props.classes;
     if (props.aliancas !== undefined) this.props.aliancas = props.aliancas;
     if (props.planetaNatal !== undefined) this.props.planetaNatal = props.planetaNatal;
+  }
+
+  evolveClass(fromClass: CharacterClass, toClass: CharacterClass): void {
+    if (!this.props.classes.includes(fromClass)) {
+      throw new AppError(`O personagem não possui a classe "${fromClass}" para evoluir.`);
+    }
+
+    if (!isValidClassEvolution(fromClass, toClass)) {
+      throw new AppError(`Não é possível evoluir de "${fromClass}" para "${toClass}".`);
+    }
+
+    this.props.classes = this.props.classes.map((classe) =>
+      classe === fromClass ? toClass : classe,
+    );
   }
 }

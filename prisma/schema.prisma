@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CharacterClass {
+  JEDI
+  MESTRE_JEDI
+  SITH
+  LORDE_SITH
+  USUARIO_DA_FORCA
+  SOLDADO
+  OFICIAL
+  COMANDANTE
+  SENADOR
+  DIPLOMATA
+  CHANCELER
+  REI
+  CAVALEIRO_DE_REN
+  CONTRABANDISTA
+  PILOTO
+  CIVIL
+}
+
+enum CharacterRace {
+  HUMANO
+  TWILEK
+  TOGRUTA
+  WOOKIEE
+  ZABRAK
+  RODIANO
+  MON_CALAMARI
+  DATHOMIRIANO
+  DROIDE
+}
+
+enum CharacterAlliance {
+  REPUBLICA
+  SEPARATISTA
+  IMPERIO
+  REBELDE
+  ORDEM_JEDI
+  ORDEM_SITH
+  PRIMEIRA_ORDEM
+  RESISTENCIA
+  CAVALEIROS_DE_REN
+}
+
+model Character {
+  id           String              @id
+  nome         String
+  raca         CharacterRace
+  classes      CharacterClass[]
+  aliancas     CharacterAlliance[]
+  planetaNatal String              @map("planeta_natal")
+
+  @@map("characters")
+}

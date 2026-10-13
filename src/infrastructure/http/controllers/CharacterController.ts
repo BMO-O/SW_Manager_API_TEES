@@ -7,6 +7,9 @@ import { GetCharacterByIdUseCase } from '../../../application/use-cases/GetChara
 import { UpdateCharacterUseCase } from '../../../application/use-cases/UpdateCharacterUseCase';
 import { DeleteCharacterUseCase } from '../../../application/use-cases/DeleteCharacterUseCase';
 import { GetCharacterStatsUseCase } from '../../../application/use-cases/GetCharacterStatsUseCase';
+import { EvolveCharacterClassUseCase } from '../../../application/use-cases/EvolveCharacterClassUseCase';
+import { SearchExternalCharacterUseCase } from '../../../application/use-cases/SearchExternalCharacterUseCase';
+import { CharacterClass } from '../../../domain/entities/Character';
 
 export class CharacterController {
   constructor(
@@ -15,28 +18,38 @@ export class CharacterController {
     private getCharacterByIdUseCase: GetCharacterByIdUseCase,
     private updateCharacterUseCase: UpdateCharacterUseCase,
     private deleteCharacterUseCase: DeleteCharacterUseCase,
-    private getCharacterStatsUseCase: GetCharacterStatsUseCase
+    private getCharacterStatsUseCase: GetCharacterStatsUseCase,
+    private evolveCharacterClassUseCase: EvolveCharacterClassUseCase,
+    private searchExternalCharacterUseCase: SearchExternalCharacterUseCase,
   ) {}
 
   list = async (req: Request, res: Response, next: NextFunction) => {
-    
     try {
-      const { classe, raca, alianca } = req.query;
+      const { classe, raca, alianca, nome, page, limit } = req.query as unknown as {
+        classe?: string;
+        raca?: string;
+        alianca?: string;
+        nome?: string;
+        page?: number;
+        limit?: number;
+      };
 
-      const characters = await this.listCharactersUseCase.execute({
-        classe: typeof classe === 'string' ? classe : undefined,
-        raca: typeof raca === 'string' ? raca : undefined,
-        alianca: typeof alianca === 'string' ? alianca : undefined,
+      const result = await this.listCharactersUseCase.execute({
+        classe,
+        raca,
+        alianca,
+        nome,
+        page,
+        limit,
       });
 
-      return res.status(200).json(characters);
+      return res.status(200).json(result);
     } catch (error) {
       next(error);
     }
   };
 
   getById = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-
     try {
       const { id } = req.params;
       const character = await this.getCharacterByIdUseCase.execute(id);
@@ -47,7 +60,6 @@ export class CharacterController {
   };
 
   getStats = async (req: Request, res: Response, next: NextFunction) => {
-
     try {
       const stats = await this.getCharacterStatsUseCase.execute();
       return res.status(200).json(stats);
@@ -59,9 +71,8 @@ export class CharacterController {
   create = async (
     req: Request<Record<string, never>, unknown, CreateCharacterDTO>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
-
     try {
       const character = await this.createCharacterUseCase.execute(req.body);
       return res.status(201).json({
@@ -76,9 +87,8 @@ export class CharacterController {
   update = async (
     req: Request<{ id: string }, unknown, UpdateCharacterDTO>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
-    
     try {
       const { id } = req.params;
       const character = await this.updateCharacterUseCase.execute(id, req.body);
@@ -91,8 +101,36 @@ export class CharacterController {
     }
   };
 
+  evolveClass = async (
+    req: Request<{ id: string }, unknown, { fromClass: CharacterClass; toClass: CharacterClass }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { id } = req.params;
+      const { fromClass, toClass } = req.body;
+      const character = await this.evolveCharacterClassUseCase.execute({ id, fromClass, toClass });
+      return res.status(200).json({
+        message: 'Classe evoluída com sucesso!',
+        data: character,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  searchExternal = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { nome } = res.locals.validatedQuery as { nome: string };
+      const result = await this.searchExternalCharacterUseCase.execute(nome);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+  
   delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-    
     try {
       const { id } = req.params;
       await this.deleteCharacterUseCase.execute(id);
