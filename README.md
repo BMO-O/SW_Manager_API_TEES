@@ -3,6 +3,8 @@
 ![Node.js](https://img.shields.io/badge/Node.js-v20-green?logo=nodedotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-v5.0-blue?logo=typescript)
 ![Express](https://img.shields.io/badge/Express-v4.0-lightgrey?logo=express)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql)
 ![Clean Architecture](https://img.shields.io/badge/Architecture-Clean--Arch-orange)
 ![Swagger](https://img.shields.io/badge/Documentation-Swagger-brightgreen?logo=swagger)
 
@@ -18,44 +20,76 @@ O projeto segue os princípios da **Clean Architecture (Arquitetura Limpa)**, ga
 
 ```text
 src/
-├── application/             # [Camada 1] Casos de Uso (Lógica de Aplicação)
-│   ├── dtos/                # Objetos de Transferência de Dados (DTOs)
-│   └── use-cases/           # CreateCharacter, ListCharacters, GetCharacterById, etc.
+├── application/                  # Casos de uso e DTOs
+│   ├── dtos/
+│   └── use-cases/
 │
-├── domain/                  # [Camada 2] Entidades de negócio e contratos (Interfaces)
-│   ├── entities/            # Regras de negócio puras (ex: Character)
-│   ├── errors/              # Exceção de domínio (AppError)
-│   └── repositories/        # Contrato ICharacterRepository
+├── domain/                       # Entidades, erros e contratos
+│   ├── entities/
+│   ├── errors/
+│   ├── gateways/
+│   └── repositories/
 │
-├── infrastructure/          # [Camada 3] Frameworks, Banco de Dados e HTTP
-│   ├── database/            # Repositório em memória (InMemoryCharacterRepository)
-│   └── http/                # Controllers, Routers e Middlewares do Express
+├── infrastructure/               # Banco de dados, gateways e HTTP
+│   ├── database/
+│   │   └── prisma/
+│   ├── gateways/
+│   └── http/
+│       ├── controllers/
+│       ├── middlewares/
+│       ├── routes/
+│       └── schemas/
 │
-└── main/                    # [Camada 4] Ponto de Composição (Setup da Aplicação)
-    ├── config/              # Configurações gerais e especificação Swagger/OpenAPI
-    ├── factories/           # Instanciação e Injeção de Dependências
-    └── server.ts            # Inicialização do Servidor HTTP
+└── main/                         # Configuração e composição
+    ├── config/
+    ├── factories/
+    └── server.ts
 ```
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-- Runtime: Node.js (v20+)
+- Runtime: Node.js
 - Linguagem: TypeScript
 - Framework Web: Express
-- Execução em Dev: ts-node-dev (ou ts-node)
-- Documentação: Swagger UI Express + swagger-autogen
-- Qualidade/Padrões: ESLint & Prettier
-
+- Banco de dados: PostgreSQL
+- ORM: Prisma
+- Validação: Zod
+- Cliente HTTP: Axios
+- API externa: SWAPI
+- Documentação: Swagger UI e swagger-autogen
+- Conteinerização: Docker e Docker Compose
 ---
 
 ## 🚀 Como Executar o Projeto Localmente
 
 ### Pré-requisitos
 
-- Node.js (v18 ou superior)
-- npm ou pnpm instalado
+- Node.js e npm instalados
+- PostgreSQL disponível localmente ou executado pelo Docker
+- Docker Desktop, caso queira iniciar os serviços com Docker Compose
+
+### Configuração do ambiente
+
+Crie um arquivo `.env` na raiz do projeto. Use os valores correspondentes ao seu ambiente:
+
+```env
+PORT=3333
+NODE_ENV=development
+
+POSTGRES_USER=sw_manager
+POSTGRES_PASSWORD=sw_manager_pass
+POSTGRES_DB=sw_manager_db
+POSTGRES_PORT=5432
+
+DATABASE_URL="postgresql://sw_manager:sw_manager_pass@localhost:5432/sw_manager_db?schema=public"
+
+USE_EXTERNAL_API=true
+
+Com `USE_EXTERNAL_API=true`, a busca de personagens utiliza a SWAPI. Com `USE_EXTERNAL_API=false`, utiliza o gateway em memória. Reinicie o servidor depois de alterar essa variável.
+
+```
 
 ### Passo a Passo
 
@@ -64,14 +98,42 @@ src/
 $ git clone https://github.com/BMO-O/SW_Manager_API_TEES
 
 # 2. Acessar a pasta do projeto
-$ cd sw_manager_api_tees
+$ cd SW_Manager_API_TEES
 
 # 3. Instalar as dependências
 $ npm install
 
-# 4. Executar o projeto em modo de desenvolvimento
-$ npm run start
+# 4. Gerar o Prisma Client
+npx prisma generate
+
+# 5. Aplicar as migrations do banco
+npx prisma migrate dev
+
+# 6. Iniciar a aplicação
+npm run start
 ```
+
+## 🐳 Como Executar com Docker Compose
+
+O arquivo `docker-compose.yml` define os serviços `postgres`, `api` e `pgadmin`.
+
+```bash
+# Iniciar os serviços
+docker compose up -d
+
+# Verificar o estado dos serviços
+docker compose ps
+
+# Consultar os logs da API
+docker compose logs --tail=100 api
+
+# Parar os serviços
+docker compose down
+```
+
+A porta `3333` precisa estar livre para iniciar a API pelo Docker. Se a aplicação já estiver rodando localmente nessa porta, encerre o processo local antes de iniciar o serviço `api` no Compose.
+
+---
 
 O servidor iniciará na porta 3333:
 
@@ -82,85 +144,51 @@ O servidor iniciará na porta 3333:
 
 ## 📖 Documentação dos Endpoints (RESTful)
 
-A documentação interativa completa está acessível via Swagger no navegador em `/api/docs`.
+A documentação interativa está disponível no Swagger em `http://localhost:3333/api/docs`.
 
-| Método | Endpoint                     | Descrição                                                                 | Status de Sucesso |
-|--------|------------------------------|---------------------------------------------------------------------------|-------------------|
-| POST   | `/api/v1/characters`         | Cadastra um novo personagem no catálogo                                   | 201 Created       |
-| GET    | `/api/v1/characters`         | Lista personagens (com suporte a filtros por raça, classe e aliança)      | 200 OK            |
-| GET    | `/api/v1/characters/:id`     | Busca um personagem pelo ID                                               | 200 OK            |
-| PUT    | `/api/v1/characters/:id`     | Atualiza os dados de um personagem                                        | 200 OK            |
-| DELETE | `/api/v1/characters/:id`     | Remove um personagem do catálogo                                          | 204 No Content    |
-| GET    | `/api/v1/characters/stats`   | Retorna estatísticas gerais do catálogo de personagens                    | 200 OK            |
-
----
-
-## 🧪 Exemplos de Requisições (cURL)
-
-### Cadastrar Personagem
-
-```bash
-curl --request POST \
-  --url http://localhost:3333/api/v1/characters \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "id": "1",
-    "nome": "Luke Skywalker",
-    "raca": "Humano",
-    "classes": ["Jedi"],
-    "aliancas": ["Rebelde", "Ordem Jedi"],
-    "planetaNatal": "Tatooine"
-  }'
-```
-
-### Listar Personagens com Filtro de Raça
-
-```bash
-curl --request GET \
-  --url 'http://localhost:3333/api/v1/characters?raca=Humano'
-```
-
-### Atualizar Personagem
-
-```bash
-curl --request PUT \
-  --url http://localhost:3333/api/v1/characters/1 \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "nome": "Luke Skywalker (Corrompido)",
-    "classes": ["Sith"],
-    "planetaNatal": "Ahch-To"
-  }'
-```
-
-### Buscar Estatísticas
-
-```bash
-curl --request GET \
-  --url http://localhost:3333/api/v1/characters/stats
-```
+| Método | Endpoint | Descrição | Status de Sucesso |
+|---|---|---|---|
+| `POST` | `/api/v1/characters` | Cadastra um personagem no catálogo | `201 Created` |
+| `GET` | `/api/v1/characters` | Lista personagens; aceita filtros e paginação, conforme validação configurada | `200 OK` |
+| `GET` | `/api/v1/characters/stats` | Retorna estatísticas do catálogo | `200 OK` |
+| `GET` | `/api/v1/characters/:id` | Busca um personagem pelo ID | `200 OK` |
+| `PUT` | `/api/v1/characters/:id` | Atualiza os dados de um personagem | `200 OK` |
+| `PATCH` | `/api/v1/characters/:id/evolve` | Evolui uma classe do personagem | `200 OK` |
+| `DELETE` | `/api/v1/characters/:id` | Remove um personagem do catálogo | `204 No Content` |
+| `GET` | `/api/v1/characters/swapi/search?nome=LUKE` | Busca um personagem na SWAPI ou no gateway em memória | `200 OK` |
 
 ---
 
-## 🛡️ Padronização de Erros
+## 🛡️ Validação e Tratamento de Erros
 
-A API utiliza a classe `AppError` e um Middleware Global de Erros, garantindo respostas estruturadas:
+As entradas são validadas na camada HTTP antes de chegarem aos casos de uso. A resposta de erro utiliza uma estrutura padronizada. Por exemplo, uma falha de validação pode retornar:
 
 ```json
 {
   "status": "error",
-  "statusCode": 404,
-  "message": "Personagem não encontrado no catálogo."
+  "message": "Dados de entrada inválidos",
+  "details": [
+    {
+      "field": "nome",
+      "message": "O nome deve ter no mínimo 2 caracteres"
+    }
+  ]
 }
 ```
+
+Erros de domínio e de persistência são tratados pelo middleware global, que evita expor detalhes internos da aplicação ao cliente.
 
 ---
 
 ## 📝 Notas e Observações
 
-Durante o desenvolvimento e a configuração da documentação interativa com Swagger, foi observada uma particularidade no exemplo de resposta para o endpoint de **Atualização de Personagem (PUT /api/v1/characters/:id)**.
-
-Embora o corpo da requisição (`request body`) para o PUT reflita corretamente os dados a serem atualizados (ex: nome para "Luke Skywalker (Mestre Jedi)", planeta para "Ahch-To"), o **exemplo de valor da resposta (HTTP 200 OK)** continua exibindo os dados originais do personagem (ex: nome "Luke Skywalker", planeta "Tatooine"). 
+- A busca na SWAPI consulta dados externos e não cadastra automaticamente o personagem no banco local.
+- O gateway em memória contém dados de exemplo para testes offline.
+- Após alterar `USE_EXTERNAL_API`, reinicie a aplicação para carregar a configuração.
+- Os valores enviados para raça, classe e aliança devem corresponder aos enums definidos pela aplicação. Nos exemplos deste README, esses valores estão em letras maiúsculas.
+- O endpoint de busca externa é `/api/v1/characters/swapi/search`, com o parâmetro de consulta `nome`.
+- Prints relacionadas aos exercícios na pasta docs.
+- Em alguns exercícios, não consegui encontrar uma forma de adaptá-los ao meu domínio, especialmente nos que envolviam treinadores Pokémon.
 
 ---
 
